@@ -1,0 +1,58 @@
+<!-- views/exam.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= branding %> - Take Exam</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1><%= branding %>: QuizVibe Exam</h1>
+    <img src="/placeholder-logo.jpg" alt="Professor Brown's Secret Lab Logo" width="200">
+  </header>
+  <main>
+    <h2>Final Exam</h2>
+    <form id="examForm">
+      <% questions.forEach(q => { %>
+        <div class="question">
+          <p><strong>Question <%= q.questionId %>:</strong> <%= q.text %> (<%= q.type %>)</p>
+          <% if (q.type === 'mcq') { %>
+            <% q.options.forEach((opt, idx) => { %>
+              <input type="radio" name="answer_<%= q.questionId %>" value="<%= opt.split(':')[0] || idx %>"> <%= opt %><br>
+            <% }); %>
+          <% } else { %>
+            <textarea name="answer_<%= q.questionId %>" rows="4" cols="50" placeholder="Your discussion answer..."></textarea>
+          <% } %>
+        </div>
+      <% }); %>
+      <button type="button" onclick="submitAnswers()">Submit Exam</button>
+    </form>
+  </main>
+  <script>
+    function submitAnswers() {
+      const form = document.getElementById('examForm');
+      const answers = [];
+      <% questions.forEach(q => { %>
+        let answer;
+        if ('<%= q.type %>' === 'mcq') {
+          const selected = form.querySelector(`input[name="answer_<%= q.questionId %>"]:checked`);
+          answer = selected ? selected.value : '';
+        } else {
+          answer = form.querySelector(`textarea[name="answer_<%= q.questionId %>"]`).value;
+        }
+        answers.push({ questionId: '<%= q.questionId %>', answer });
+      <% }); %>
+      fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+        body: JSON.stringify({ answers })
+      }).then(res => {
+        alert('Submitted!');
+        window.location.href = '/my-performance';
+      });
+    }
+  </script>
+</body>
+</html>
