@@ -1,0 +1,38 @@
+<!-- views/performance.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= branding %> - My Performance</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1><%= branding %>: QuizVibe Performance</h1>
+    <img src="/placeholder-logo.jpg" alt="Professor Brown's Secret Lab Logo" width="200">
+  </header>
+  <main>
+    <h2>Your Exam Performance</h2>
+    <% if (submissions.length === 0) { %>
+      <p>No submissions yet.</p>
+    <% } else { %>
+      <% submissions.forEach(sub => { %>
+        <section>
+          <h3>Exam: <%= sub.examId %> (Graded: <%= sub.gradedAt ? 'Yes' : 'No' %>)</h3>
+          <ul>
+            <% sub.answers.forEach(ans => { %>
+              <li>
+                <strong>Question <%= ans.questionId %>:</strong> Your answer - <%= ans.answer %>
+                <br>Grade: <%= ans.grade ?? 'Pending' %>
+                <br>Feedback: <%= ans.feedback ?? 'None yet' %>
+              </li>
+            <% }); %>
+          </ul>
+          <p>Total Score: <%= sub.totalScore ?? 'Pending' %></p>
+        </section>
+      <% }); %>
+    <% } %>
+  </main>
+</body>
+</html>
